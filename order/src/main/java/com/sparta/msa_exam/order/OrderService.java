@@ -8,6 +8,8 @@ import com.sparta.msa_exam.order.entity.Order;
 import com.sparta.msa_exam.order.entity.OrderProduct;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,17 +23,20 @@ public class OrderService {
     private final ProductClient productClient;
 
     @Transactional
-    public void createOrder(OrderReq orderReq) {
+    @CachePut(cacheNames = "orderCache", key = "#result")
+    public Long createOrder(OrderReq orderReq) {
         Order order = Order.builder()
                 .name(orderReq.getName())
                 .build();
         List<OrderProduct> orderProducts = vaildProduct(order, orderReq.getProductIds());
         order.setOrderProducts(orderProducts);
         orderRepository.save(order);
+        return order.getOrderId();
     }
 
 
     @Transactional
+    @CachePut(cacheNames = "orderCache", key = "args[0]")
     public void updateOrder(Long orderId, Long productId) {
         Order order = orderRepository.findById(orderId).orElseThrow();
 
@@ -42,6 +47,7 @@ public class OrderService {
         orderRepository.save(order);
     }
 
+    @Cacheable(cacheNames = "orderCache", key = "args[0]")
     public OrderRes getOrders(Long orderId) {
         Order order = orderRepository.findById(orderId).orElseThrow();
 
