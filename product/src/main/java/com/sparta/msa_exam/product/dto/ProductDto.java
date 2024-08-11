@@ -11,15 +11,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class ProductDto {
-    private Long product_id;
+    private Long productId;
     private String name;
-    private Integer supply_price;
+    private Integer supplyPrice;
 
     public static ProductDto toDto(Product product) {
         return ProductDto.builder()
-                .product_id(product.getProduct_id())
+                .productId(product.getProductId())
                 .name(product.getName())
-                .supply_price(product.getSupply_price())
+                .supplyPrice(product. getSupplyPrice())
                 .build();
     }
 }

@@ -14,9 +14,13 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     public String createProduct(ProductReq productReq) {
+        productRepository.findByName(productReq.getName())
+                .ifPresent(product -> {
+                    throw new IllegalArgumentException("이미 존재하는 상품입니다.");
+                });
         Product product = Product.builder()
                 .name(productReq.getName())
-                .supply_price(productReq.getSupply_price())
+                .supplyPrice(productReq.getSupplyPrice())
                 .build();
         productRepository.save(product);
         return "상품이 등록되었습니다.";
