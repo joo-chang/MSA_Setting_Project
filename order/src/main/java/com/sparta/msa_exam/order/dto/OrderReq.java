@@ -1,10 +1,14 @@
 package com.sparta.msa_exam.order.dto;
 
-import lombok.Data;
+import lombok.*;
 
 import java.util.List;
 
-@Data
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrderReq {
     private String name;
     private List<Long> productIds;

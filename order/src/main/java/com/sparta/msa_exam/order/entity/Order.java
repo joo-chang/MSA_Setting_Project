@@ -23,6 +23,16 @@ public class Order {
     private List<OrderProduct> productIds = new ArrayList<>();
 
     public void addProduct(OrderProduct orderProduct) {
+        if (productIds == null) {
+            productIds = new ArrayList<>();
+        }
         productIds.add(orderProduct);
+    }
+
+    public void setOrderProducts(List<OrderProduct> orderProducts) {
+        if (productIds == null) {
+            productIds = new ArrayList<>();
+        }
+        productIds.addAll(orderProducts);
     }
 }

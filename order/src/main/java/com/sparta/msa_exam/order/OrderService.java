@@ -25,24 +25,20 @@ public class OrderService {
         Order order = Order.builder()
                 .name(orderReq.getName())
                 .build();
-        List<ProductResponseDto> products = productClient.getProducts();
-        List<Long> productIds = products.stream().map(ProductResponseDto::getProductId).toList();
-        for (Long productId : orderReq.getProductIds()) {
-            if(!productIds.contains(productId)) {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
-            }
-            OrderProduct orderProduct = OrderProduct.builder()
-                    .productId(productId)
-                    .build();
-            order.addProduct(orderProduct);
-        }
+        List<OrderProduct> orderProducts = vaildProduct(order, orderReq.getProductIds());
+        order.setOrderProducts(orderProducts);
         orderRepository.save(order);
     }
+
 
     @Transactional
     public void updateOrder(Long orderId, Long productId) {
         Order order = orderRepository.findById(orderId).orElseThrow();
-        order.getProductIds().add(OrderProduct.builder().productId(productId).build());
+
+        List<OrderProduct> orderProducts = vaildProduct(order, List.of(productId));
+        order.setOrderProducts(orderProducts);
+
+        order.addProduct(OrderProduct.createOrderProduct(order, productId));
         orderRepository.save(order);
     }
 
@@ -54,5 +50,16 @@ public class OrderService {
                 .name(order.getName())
                 .products(order.getProductIds().stream().map(OrderProduct::getProductId).toList())
                 .build();
+    }
+
+    private List<OrderProduct> vaildProduct(Order order, List<Long> productIds) {
+        List<ProductResponseDto> products = productClient.getProducts();
+        List<Long> validProductIds = products.stream().map(ProductResponseDto::getProductId).toList();
+        for (Long productId : productIds) {
+            if(!validProductIds.contains(productId)) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found");
+            }
+        }
+        return productIds.stream().map(productId -> OrderProduct.createOrderProduct(order, productId)).toList();
     }
 }

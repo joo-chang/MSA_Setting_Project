@@ -7,9 +7,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/order")
+@RequestMapping("/orders")
 @RequiredArgsConstructor
 public class OrderController {
+
     private final OrderService orderService;
 
     @PostMapping
@@ -19,7 +20,7 @@ public class OrderController {
     }
 
     @PutMapping("/{orderId}")
-    public ResponseEntity<Void> updateOrder(@PathVariable("orderId") Long orderId, @RequestBody Long productId) {
+    public ResponseEntity<Void> updateOrder(@PathVariable("orderId") Long orderId, @RequestParam("productId") Long productId) {
         orderService.updateOrder(orderId, productId);
         return ResponseEntity.ok().build();
     }
